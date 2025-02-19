@@ -14,21 +14,22 @@ datasource db {
 }
 
 model User {
-  id              String   @id @default(uuid())
+  id              String         @id @default(uuid())
   name            String
   firstName       String?
   address         String?
   shippingAddress String?
-  email           String   @unique
+  email           String         @unique
   password        String
-  phone           String?  @unique
+  phone           String?        @unique
   refreshToken    String?
-  role            Role     @default(USER)
+  role            Role           @default(USER)
   store           Store? // Un utilisateur peut 1 et 1 seule boutique
   orders          Order[] // Un utilisateur peut passer plusieurs commandes
   reviews         Review[] // Un utilisateur peut laisser plusieurs avis
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  Notification    Notification[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model Store {
@@ -44,56 +45,55 @@ model Store {
 }
 
 model Product {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  stock       Int           @default(0)
-  category    Category      @relation(fields: [categoryId], references: [id])
-  status      ProductStatus @default(DRAFT)
-  variants    Variant[]
+  id           String         @id @default(uuid())
+  name         String
+  description  String?
+  price        Float
+  stock        Int            @default(0)
+  categoryCode Int // Référence un `code` dans `categories.json`
+  status       ProductStatus  @default(DRAFT)
+  images       ProductImage[]
+  variants     Variant[]
+  store        Store          @relation(fields: [storeId], references: [id])
+  storeId      String
+  orders       OrderItem[]
+  reviews      Review[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime? // Soft delete
+}
 
-  categoryId String
-  store      Store       @relation(fields: [storeId], references: [id])
-  storeId    String
-  orders     OrderItem[]
-  reviews    Review[]
+model ProductImage {
+  id        String   @id @default(uuid())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  url       String
+  isPrimary Boolean  @default(false) // Définit l'image principale
+  createdAt DateTime @default(now())
+}
+
+model Variant {
+  id         String      @id @default(uuid())
+  product    Product     @relation(fields: [productId], references: [id])
+  productId  String
+  attributes Json? // Stocke les variantes sous forme JSON (ex: {"Taille": "M", "Couleur": "Rouge"})
+  stock      Int         @default(0) // Stock disponible pour cette variante
+  price      Float? // Prix spécifique pour cette variante (sinon basePrice est utilisé)
+  orders     OrderItem[] // Permet de savoir quelles variantes ont été commandées
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 }
 
-model Variant {
-  id        String      @id @default(uuid())
-  product   Product     @relation(fields: [productId], references: [id])
-  productId String
-  color     String? // Couleur de la variante (ex: Rouge, Bleu)
-  size      String? // Taille de la variante (ex: S, M, L)
-  stock     Int         @default(0) // Stock disponible pour cette variante
-  price     Float? // Prix spécifique pour cette variante (sinon basePrice est utilisé)
-  orders    OrderItem[] // Permet de savoir quelles variantes ont été commandées
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-}
-
-model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  description String
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
 //Model que le client voit avec les differentes limites 
 model SubscriptionPlan {
-  id           String         @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
   price        Float
   duration     Int // Durée en jours
   maxProducts  Int // Nombre maximum de produits pour ce plan
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  Subscription Subscription[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  subscription Subscription?
 }
 
 model Subscription {
@@ -101,7 +101,7 @@ model Subscription {
   store     Store              @relation(fields: [storeId], references: [id])
   storeId   String             @unique
   plan      SubscriptionPlan   @relation(fields: [planId], references: [id])
-  planId    String
+  planId    String             @unique
   startDate DateTime           @default(now())
   endDate   DateTime
   status    SubscriptionStatus @default(PENDING)
@@ -140,6 +140,45 @@ model Review {
   createdAt DateTime @default(now())
 }
 
+model Notification {
+  id        String           @id @default(uuid())
+  user      User             @relation(fields: [userId], references: [id])
+  userId    String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}
+
+enum NotificationType {
+  ORDER_UPDATE
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+  PROMOTION
+  NEW_ORDER
+}
+
+//Model a reflechir car les livreurs n'existe pas
+// model Shipment {
+//   id         String        @id @default(uuid())
+//   order      Order         @relation(fields: [orderId], references: [id])
+//   orderId    String        @unique
+//   trackingId String?       // Numéro de suivi du transporteur
+//   carrier    String?       // Nom du transporteur
+//   status     ShipmentStatus @default(PENDING)
+//   estimatedDelivery DateTime?
+//   createdAt  DateTime      @default(now())
+//   updatedAt  DateTime      @updatedAt
+// }
+
+// enum ShipmentStatus {
+//   PENDING
+//   SHIPPED
+//   IN_TRANSIT
+//   DELIVERED
+//   RETURNED
+// }
+
 enum OrderStatus {
   NEW
   IN_PROGRESS
@@ -150,9 +189,8 @@ enum OrderStatus {
 
 enum ProductStatus {
   PUBLISH
-  LOW_SCTOK
-  OUT_STOCK
   DRAFT
+  DISABLED
 }
 
 enum SubscriptionStatus {
