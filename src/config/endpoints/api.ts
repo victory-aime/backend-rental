@@ -16,4 +16,9 @@ export const APIS_URL = {
     GLOBAL_ROUTES: `${BASE_APIS_URL.SECURED}/user`,
     CREATE_USER: 'create-user',
   },
+  PRODUCTS_MANAGEMENT: {
+    GLOBAL_ROUTES: `${BASE_APIS_URL.SECURED}/products`,
+    GET_ALL_PRODUCTS: 'get-products',
+    NEW_PRODUCT: 'add-product',
+  },
 };

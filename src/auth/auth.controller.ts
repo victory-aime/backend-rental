@@ -40,9 +40,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.authService.validateUser(body.email, body.password);
-    return res
-      .status(HttpStatus.OK)
-      .json({ message: 'Logged in successfully', user: user });
+    return await this.authService.login(user, res);
   }
 
   @Post(APIS_URL.AUTH_MANAGEMENT.SIGN_UP)

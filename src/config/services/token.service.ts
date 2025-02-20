@@ -11,7 +11,7 @@ export class TokenService {
       { sub: userId, role },
       {
         secret: process.env.JWT_SECRET_KEY,
-        expiresIn: '15m',
+        expiresIn: '7d',
       },
     );
   }

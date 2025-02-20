@@ -32,25 +32,13 @@ model User {
   updatedAt       DateTime       @updatedAt
 }
 
-model Store {
-  id           String        @id @default(uuid())
-  name         String
-  description  String?
-  owner        User          @relation(fields: [ownerId], references: [id])
-  ownerId      String        @unique
-  products     Product[]
-  subscription Subscription? // Chaque boutique peut avoir un abonnement
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-}
-
 model Product {
   id           String         @id @default(uuid())
   name         String
   description  String?
   price        Float
   stock        Int            @default(0)
-  categoryCode Int // Référence un `code` dans `categories.json`
+  categoryName String
   status       ProductStatus  @default(DRAFT)
   images       ProductImage[]
   variants     Variant[]
@@ -85,26 +73,49 @@ model Variant {
 }
 
 //Model que le client voit avec les differentes limites 
+model Store {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  image         String?
+  owner         User           @relation(fields: [ownerId], references: [id])
+  ownerId       String         @unique
+  products      Product[]
+  subscriptions Subscription[] // Une boutique peut avoir plusieurs abonnements au fil du temps
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+}
+
 model SubscriptionPlan {
-  id           String        @id @default(uuid())
-  name         String
-  price        Float
-  duration     Int // Durée en jours
-  maxProducts  Int // Nombre maximum de produits pour ce plan
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  subscription Subscription?
+  id                    String               @id @default(uuid())
+  name                  SubscriptionPlanType @unique @default(BASIC)
+  price                 Float
+  duration              Int // Durée en jours
+  maxProducts           Int // Nombre max de produits
+  maxVariantsPerProduct Int? // Limite de variantes par produit
+  maxImagesPerProduct   Int? // Limite d'images par produit
+  maxCategories         Int? // Limite de catégories attribuables
+  maxReviewsPerMonth    Int? // Limite d'avis laissés par mois
+  maxOrdersPerMonth     Int? // Limite de commandes mensuelles
+  canUseDiscounts       Boolean              @default(false) // Activation des réductions
+  canAccessAnalytics    Boolean              @default(false) // Accès aux stats avancées
+  prioritySupport       Boolean              @default(false) // Support prioritaire
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  subscriptions         Subscription[]
 }
 
 model Subscription {
-  id        String             @id @default(uuid())
-  store     Store              @relation(fields: [storeId], references: [id])
-  storeId   String             @unique
-  plan      SubscriptionPlan   @relation(fields: [planId], references: [id])
-  planId    String             @unique
-  startDate DateTime           @default(now())
-  endDate   DateTime
-  status    SubscriptionStatus @default(PENDING)
+  id         String             @id @default(uuid())
+  store      Store              @relation(fields: [storeId], references: [id])
+  storeId    String // Plus de @unique pour permettre plusieurs abonnements dans le temps
+  plan       SubscriptionPlan   @relation(fields: [planId], references: [id])
+  planId     String
+  startDate  DateTime           @default(now())
+  endDate    DateTime
+  status     SubscriptionStatus @default(PENDING) // Gérer côté application qu’un store ait 1 seul abonnement "ACTIVE"
+  canceledAt DateTime?
 }
 
 model Order {
@@ -191,6 +202,13 @@ enum ProductStatus {
   PUBLISH
   DRAFT
   DISABLED
+}
+
+enum SubscriptionPlanType {
+  BASIC
+  STANDARD
+  PREMIUM
+  PRO
 }
 
 enum SubscriptionStatus {

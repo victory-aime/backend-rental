@@ -27,4 +27,11 @@ export class UsersService {
     }
     return user;
   }
+
+  async getUserStoreInfo(id: any) {
+    const store = this.prisma.store.findUnique({
+      where: { ownerId: id },
+    });
+    return store;
+  }
 }

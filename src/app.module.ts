@@ -7,6 +7,7 @@ import {
 } from 'nest-winston';
 import * as winston from 'winston';
 import { UsersModule } from './users';
+import { ProductsModule } from './products';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { UsersModule } from './users';
     }),
     UsersModule,
     AuthModule,
+    ProductsModule,
   ],
   controllers: [],
   providers: [],

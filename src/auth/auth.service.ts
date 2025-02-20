@@ -59,7 +59,10 @@ export class AuthService {
     }
   }
 
-  async login(user: UsersDto, res: Response) {
+  async login(
+    user: UsersDto,
+    res: Response,
+  ): Promise<{ message: string; access_token: string; user: any }> {
     const { password: _, ...userWithoutPassword } = user;
     const access_token = this.tokenService.generateAccessToken(
       userWithoutPassword.id,
@@ -68,6 +71,10 @@ export class AuthService {
     const refreshToken = this.tokenService.generateRefreshToken(
       userWithoutPassword.id,
     );
+    const store = await this.usersService.getUserStoreInfo(
+      userWithoutPassword.id,
+    );
+
     await this.prisma.user.update({
       where: { id: userWithoutPassword.id },
       data: { refreshToken: await bcrypt.hash(refreshToken, 12) },
@@ -75,7 +82,11 @@ export class AuthService {
 
     this.cookieService.setRefreshTokenCookie(res, refreshToken);
 
-    return { access_token, user: { ...userWithoutPassword } };
+    return {
+      message: 'Logged in successfully',
+      access_token,
+      user: { ...userWithoutPassword, store: { ...store } },
+    };
   }
 
   async signUp(user: UsersDto): Promise<User> {

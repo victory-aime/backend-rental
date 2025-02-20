@@ -9,6 +9,7 @@ const PAGINATION = {
 
 enum SWAGGER_TAGS {
   AUTH_MANAGEMENT = 'auth-management',
+  PRODUCTS_MANAGEMENT = 'products-management',
   USER_MANAGEMENT = 'user-management',
 }
 

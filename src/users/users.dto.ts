@@ -7,6 +7,7 @@ import {
   IsOptional,
   IsUUID,
   IsEnum,
+  isObject,
 } from 'class-validator';
 
 export class UsersDto {
@@ -60,4 +61,12 @@ export class UsersDto {
   @IsEnum(Role)
   @IsOptional()
   role?: Role;
+
+  @IsOptional()
+  store?: {
+    id: string;
+    name: string;
+    description: string;
+    image: string;
+  };
 }
