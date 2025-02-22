@@ -33,43 +33,38 @@ model User {
 }
 
 model Product {
-  id           String         @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
   description  String?
   price        Float
-  stock        Int            @default(0)
+  articlePrice Float?        @default(0)
+  profit       Float?        @default(0)
+  profitMargin Float?        @default(0)
+  stock        Int           @default(0)
   categoryName String
-  status       ProductStatus  @default(DRAFT)
-  images       ProductImage[]
+  status       ProductStatus @default(DRAFT)
+  images       String[] // Tableau des URLs/Base64 des images
   variants     Variant[]
-  store        Store          @relation(fields: [storeId], references: [id])
+  store        Store         @relation(fields: [storeId], references: [id])
   storeId      String
   orders       OrderItem[]
   reviews      Review[]
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   deletedAt    DateTime? // Soft delete
 }
 
-model ProductImage {
-  id        String   @id @default(uuid())
-  product   Product  @relation(fields: [productId], references: [id])
-  productId String
-  url       String
-  isPrimary Boolean  @default(false) // Définit l'image principale
-  createdAt DateTime @default(now())
-}
-
 model Variant {
-  id         String      @id @default(uuid())
-  product    Product     @relation(fields: [productId], references: [id])
-  productId  String
-  attributes Json? // Stocke les variantes sous forme JSON (ex: {"Taille": "M", "Couleur": "Rouge"})
-  stock      Int         @default(0) // Stock disponible pour cette variante
-  price      Float? // Prix spécifique pour cette variante (sinon basePrice est utilisé)
-  orders     OrderItem[] // Permet de savoir quelles variantes ont été commandées
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id           String      @id @default(uuid())
+  product      Product     @relation(fields: [productId], references: [id])
+  productId    String
+  name         String
+  variantValue String
+  // stock        Int         @default(0)
+  // price        Float?
+  orders       OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 //Model que le client voit avec les differentes limites 

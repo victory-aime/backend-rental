@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import * as figlet from 'figlet';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import * as cookieParser from 'cookie-parser';
+import { ValidationPipe } from '@nestjs/common';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -12,6 +14,10 @@ async function bootstrap() {
     origin: '*',
     credentials: true,
   });
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+  app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle('Rental location Platform API Documentation')
     .setDescription(

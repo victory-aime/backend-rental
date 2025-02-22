@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -11,8 +11,9 @@ import { CreateProductDto } from './products.dto';
 import { ProductService } from './products.service';
 import { SWAGGER_TAGS } from '_config/enum/global.enum';
 import { APIS_URL } from '_config/endpoints/api';
+import { JwtAuthGuard } from '_config/guard';
 
-//@ApiBasicAuth()
+@ApiBasicAuth()
 @ApiTags(SWAGGER_TAGS.PRODUCTS_MANAGEMENT)
 @Controller(APIS_URL.PRODUCTS_MANAGEMENT.GLOBAL_ROUTES)
 export class ProductsController {
@@ -26,10 +27,11 @@ export class ProductsController {
   })
   @ApiNotFoundResponse({ description: 'Boutique introuvable.' })
   async create(@Body() dto: CreateProductDto) {
-    return this.productService.createProduct(dto);
+    return await this.productService.createProduct(dto);
   }
 
   @Get(APIS_URL.PRODUCTS_MANAGEMENT.GET_ALL_PRODUCTS)
+  @UseGuards(JwtAuthGuard)
   async getAllProducts(@Query('storeId') storeId: string) {
     return this.productService.getProducts(storeId);
   }

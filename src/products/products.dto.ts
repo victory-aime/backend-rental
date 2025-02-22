@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductStatus } from '@prisma/client';
 import {
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -36,6 +38,21 @@ export class CreateProductDto {
   @Min(0)
   stock: number;
 
+  @ApiProperty({ example: 10, description: 'Quantité en stock' })
+  @IsNumber()
+  @Min(0)
+  articlePrice: number;
+
+  @ApiProperty({ example: 10, description: 'Quantité en stock' })
+  @IsNumber()
+  @Min(0)
+  profit: number;
+
+  @ApiProperty({ example: 10, description: 'Quantité en stock' })
+  @IsNumber()
+  @Min(0)
+  profitMargin: number;
+
   @ApiProperty({
     example: 'Informatique',
     description: 'Nom de la catégorie du produit',
@@ -50,4 +67,33 @@ export class CreateProductDto {
   })
   @IsUUID()
   storeId?: string;
+
+  @ApiProperty({
+    example: ['data:image/png;base64,...', 'data:image/png;base64,...'],
+    description: 'Images du produit',
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  images?: string[];
+
+  variants?: { name: string; variantValue: string }[];
+
+  status?: ProductStatus;
+}
+
+export class ResponseProductDto {
+  id?: any;
+  product?: {
+    name: string;
+    images: string[];
+    variants?: { name: string; variantValue: string }[];
+  };
+  categoryName?: string;
+  stock?: number;
+  price?: number;
+  status?: ProductStatus;
+  createdAt?: Date;
+  updatedAt?: Date;
+  deletedAt?: Date | null;
 }
