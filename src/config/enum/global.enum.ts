@@ -11,6 +11,7 @@ enum SWAGGER_TAGS {
   AUTH_MANAGEMENT = 'auth-management',
   PRODUCTS_MANAGEMENT = 'products-management',
   USER_MANAGEMENT = 'user-management',
+  CATEGORIES = 'categories',
 }
 
 export { BASE_APIS_URL, PAGINATION, SWAGGER_TAGS };

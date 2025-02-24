@@ -70,7 +70,11 @@ export class ProductService {
               variantValue: variant?.variantValue,
             })),
           },
+          description: item?.description,
           price: item?.price,
+          articlePrice: item?.articlePrice,
+          profit: item?.profit,
+          profitMargin: item?.profitMargin,
           stock: item?.stock,
           categoryName: item?.categoryName,
           status: item?.status,
@@ -82,6 +86,42 @@ export class ProductService {
       };
     } catch (error) {
       throw new BadRequestException('Impossible de retourner la liste');
+    }
+  }
+
+  async updateProduct(updateDto: any): Promise<{ message: string }> {
+    try {
+      const product = await this.prisma.product.findUnique({
+        where: { id: updateDto.id, storeId: updateDto.storeId },
+        include: {
+          variants: true,
+        },
+      });
+      if (!product) {
+        throw new BadRequestException('impossible de faire la mise a jour');
+      }
+      await this.prisma.product.update({
+        where: { id: updateDto.id, storeId: updateDto.storeId },
+        data: {
+          ...updateDto,
+          variants: {
+            deleteMany: {},
+            createMany: {
+              data: updateDto.variants?.map(
+                (variant: { name: string; variantValue: string }) => ({
+                  name: variant?.name,
+                  variantValue: variant?.variantValue,
+                }),
+              ),
+            },
+          },
+        },
+      });
+      return {
+        message: 'Produit mis a jour',
+      };
+    } catch (error) {
+      throw new BadRequestException('Erreur veuillez ressayer plus tard');
     }
   }
 }

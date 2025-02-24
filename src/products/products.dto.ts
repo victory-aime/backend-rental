@@ -92,6 +92,10 @@ export class ResponseProductDto {
   categoryName?: string;
   stock?: number;
   price?: number;
+  description?: string;
+  articlePrice: number;
+  profit: number;
+  profitMargin: number;
   status?: ProductStatus;
   createdAt?: Date;
   updatedAt?: Date;

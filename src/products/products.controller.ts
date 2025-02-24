@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -34,5 +43,11 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   async getAllProducts(@Query('storeId') storeId: string) {
     return this.productService.getProducts(storeId);
+  }
+
+  @Patch(APIS_URL.PRODUCTS_MANAGEMENT.UPDATE_PRODUCT)
+  @UseGuards(JwtAuthGuard)
+  async updateProduct(@Body() data: any) {
+    return this.productService.updateProduct(data);
   }
 }

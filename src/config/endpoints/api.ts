@@ -19,6 +19,11 @@ export const APIS_URL = {
   PRODUCTS_MANAGEMENT: {
     GLOBAL_ROUTES: `${BASE_APIS_URL.SECURED}/products`,
     GET_ALL_PRODUCTS: 'get-products',
+    UPDATE_PRODUCT: 'update-product',
     NEW_PRODUCT: 'add-product',
+  },
+  CATEGORIES: {
+    GLOBAL_ROUTES: `${BASE_APIS_URL.SECURED}/categories`,
+    ADD: 'create-category',
   },
 };

@@ -8,6 +8,7 @@ import {
 import * as winston from 'winston';
 import { UsersModule } from './users';
 import { ProductsModule } from './products';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ProductsModule } from './products';
     UsersModule,
     AuthModule,
     ProductsModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
