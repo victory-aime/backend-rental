@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Patch,
   Post,
@@ -45,9 +46,33 @@ export class ProductsController {
     return this.productService.getProducts(storeId);
   }
 
+  @Get(APIS_URL.PRODUCTS_MANAGEMENT.TRASH_LIST)
+  @UseGuards(JwtAuthGuard)
+  async getTrashProducts(@Query('storeId') storeId: string) {
+    return this.productService.getTrashProducts(storeId);
+  }
+
   @Patch(APIS_URL.PRODUCTS_MANAGEMENT.UPDATE_PRODUCT)
   @UseGuards(JwtAuthGuard)
   async updateProduct(@Body() data: any) {
     return this.productService.updateProduct(data);
+  }
+
+  @Put(APIS_URL.PRODUCTS_MANAGEMENT.SOFT_DELETE_PRODUCT)
+  @UseGuards(JwtAuthGuard)
+  async softDeleteProduct(@Query('productId') productId: string) {
+    return this.productService.softdeleteProduct(productId);
+  }
+
+  @Post(APIS_URL.PRODUCTS_MANAGEMENT.RESTORE_PRODUCT)
+  @UseGuards(JwtAuthGuard)
+  async restoreProduct(@Query('productId') productId: string) {
+    return this.productService.restoreProduct(productId);
+  }
+
+  @Delete(APIS_URL.PRODUCTS_MANAGEMENT.DELETE_PRODUCT)
+  @UseGuards(JwtAuthGuard)
+  async deleteProduct(@Query('productId') productId: string) {
+    return this.productService.deletePermanently(productId);
   }
 }

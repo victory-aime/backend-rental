@@ -52,6 +52,8 @@ model Product {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   deletedAt    DateTime? // Soft delete
+
+  @@index([deletedAt]) // Permet de requêter rapidement les produits supprimés
 }
 
 model Variant {

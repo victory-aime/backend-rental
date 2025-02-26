@@ -93,9 +93,9 @@ export class ResponseProductDto {
   stock?: number;
   price?: number;
   description?: string;
-  articlePrice: number;
-  profit: number;
-  profitMargin: number;
+  articlePrice?: number;
+  profit?: number;
+  profitMargin?: number;
   status?: ProductStatus;
   createdAt?: Date;
   updatedAt?: Date;

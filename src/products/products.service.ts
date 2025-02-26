@@ -51,13 +51,16 @@ export class ProductService {
     });
   }
 
-  async getProducts(storeId: any): Promise<{ content: ResponseProductDto[] }> {
+  async getProducts(
+    storeId: string,
+  ): Promise<{ content: ResponseProductDto[] }> {
     try {
       const products = await this.prisma.product.findMany({
-        where: { storeId },
+        where: { storeId, deletedAt: null },
         include: {
           variants: true,
         },
+        orderBy: { createdAt: 'desc' },
       });
       const transformProductData: ResponseProductDto[] = products?.map(
         (item) => ({
@@ -122,6 +125,73 @@ export class ProductService {
       };
     } catch (error) {
       throw new BadRequestException('Erreur veuillez ressayer plus tard');
+    }
+  }
+
+  async softdeleteProduct(productId: string) {
+    try {
+      if (!productId) {
+        throw new BadRequestException('Informations manquantes');
+      }
+      return await this.prisma.product.update({
+        where: { id: productId },
+        data: { deletedAt: new Date() }, // Marque comme supprimé
+      });
+    } catch (error) {
+      throw new BadRequestException('Veuillez reessayer plus tard', error);
+    }
+  }
+
+  async getTrashProducts(
+    storeId: string,
+  ): Promise<{ content: ResponseProductDto[] }> {
+    const products = await this.prisma.product.findMany({
+      where: { storeId, deletedAt: { not: null } },
+      include: {
+        variants: true,
+      },
+      orderBy: { deletedAt: 'desc' },
+    });
+    const transformProductData: ResponseProductDto[] = products?.map(
+      (item) => ({
+        id: item?.id,
+        product: {
+          name: item?.name,
+          images: item?.images,
+          variants: item?.variants?.map((variant) => ({
+            name: variant.name,
+            variantValue: variant?.variantValue,
+          })),
+        },
+        price: item?.price,
+        stock: item?.stock,
+        categoryName: item?.categoryName,
+        status: item?.status,
+        deletedAt: item?.deletedAt,
+      }),
+    );
+    return {
+      content: transformProductData,
+    };
+  }
+
+  async restoreProduct(id: string) {
+    return await this.prisma.product.update({
+      where: { id },
+      data: { deletedAt: null }, // Remet à zéro la suppression
+    });
+  }
+
+  async deletePermanently(id: string): Promise<{ message: string }> {
+    try {
+      await this.prisma.product.delete({
+        where: { id },
+      });
+      return {
+        message: 'Produit supprimer',
+      };
+    } catch (error) {
+      throw new BadRequestException('Veuillez resseayer plus tard');
     }
   }
 }

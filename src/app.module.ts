@@ -9,6 +9,8 @@ import * as winston from 'winston';
 import { UsersModule } from './users';
 import { ProductsModule } from './products';
 import { CategoryModule } from './category/category.module';
+import { ProductCleanupService } from '_config/services/clean-up.service';
+import { PrismaService } from '_config/services';
 
 @Module({
   imports: [
@@ -38,6 +40,6 @@ import { CategoryModule } from './category/category.module';
     CategoryModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [ProductCleanupService, PrismaService],
 })
 export class AppModule {}

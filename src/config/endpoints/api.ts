@@ -20,6 +20,10 @@ export const APIS_URL = {
     GLOBAL_ROUTES: `${BASE_APIS_URL.SECURED}/products`,
     GET_ALL_PRODUCTS: 'get-products',
     UPDATE_PRODUCT: 'update-product',
+    SOFT_DELETE_PRODUCT: 'soft-delete-product',
+    RESTORE_PRODUCT: 'restore-product',
+    TRASH_LIST: 'trash-list',
+    DELETE_PRODUCT: 'delete-product',
     NEW_PRODUCT: 'add-product',
   },
   CATEGORIES: {
